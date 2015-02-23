@@ -1,0 +1,199 @@
+﻿@model IEnumerable<BlogMVCProject.Models.Post>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>PostOfUser</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.css" rel="stylesheet" />
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <style>
+        p {
+            text-align: justify;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="@Url.Action("Index","Home")">YourBlog</a>
+                <ul class="nav navbar-nav">
+                    <li><a href="@Url.Action("Index","Home")">Home <span class="sr-only">(current)</span></a></li>
+                    <li><a href="@Url.Action("Users","Home")">Authors <span class="sr-only">(current)</span></a></li>
+                    <li><a href="@Url.Action("Register","Home")">Register <span class="sr-only">(current)</span></a></li>
+                </ul>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <div class="navbar-form navbar-right">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">@ViewBag.User.FullName<span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="@Url.Action("Create", "Post")">New Post</a></li>
+                                <li><a href="@Url.Action("PostOfUser", "Post", new {id = ViewBag.User.Id})">My Posts</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">My Info</a></li>
+                                <li class="divider"></li>
+                                <li><a href="@Url.Action("SignOut", "Home")">Sign Out</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <form class="navbar-form navbar-right" role="search" method="POST" action="@Url.Action("Search","Post")">
+                    <div class="form-group">
+                        <input type="text" id="search" name="search" class="form-control" placeholder="Search">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" id="submit" class="btn btn-info">Search</button>
+                    </div>
+                </form>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="https://www.twitter.com">
+                            <i class="fa fa-twitter fa-2x"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.facebook.com">
+                            <i class="fa fa-facebook fa-2x"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.github.com">
+                            <i class="fa fa-github fa-2x"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+    <div class="form-horizontal">
+        <div class="page-header">
+            <div class="form-group">
+                <h2><label class="control-label col-sm-offset-2 col-sm-10" style="text-align: left;">Hello @ViewBag.User.UserName, All Post Are Here: </label></h2>
+                <span class="text-muted control-label col-sm-offset-2 col-sm-12" style="text-align: left;">Author: @ViewBag.User.FullName</span>
+                <span class="text-muted control-label col-sm-offset-2 col-sm-12" style="text-align: left;">Email: @ViewBag.User.Email</span>
+                <span class="text-muted control-label col-sm-offset-2 col-sm-12" style="text-align: left;">Created On: @ViewBag.User.CreatedDate.ToString()</span>
+                @{
+                    var postCount = 0;
+                    if (ViewBag.User.Posts != null)
+                    {
+                        postCount = ViewBag.User.Posts.Count;
+                    }
+                }
+                <p class="text-muted control-label col-sm-offset-2 col-sm-12" style="text-align: left;">Total Posts: @postCount</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-6">
+                <table class="table">
+                    <thead>
+                    <th>My Posts</th>
+                    <th></th>
+                    <th></th>
+                    </thead>
+                    <tbody>
+                        @foreach (var post in @Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            @Html.ActionLink(post.Title, "Details", new { id = post.Id })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <p>@Html.Raw(post.Content)</p>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <small class="text-muted">Posted On @post.PostedDate.ToLongDateString() @post.PostedDate.ToShortTimeString()</small>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <small class="text-muted">Viewed @post.NoOfView Times</small>
+                                        </div>
+                                        @{
+                            var count = 0;
+                            if (post.Comments != null)
+                            {
+                                count = post.Comments.Count;
+                            }
+                                        }
+                                        <div class="col-sm-12">
+                                            <small class="text-muted">Total Comments: @count</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <div class="col-sm-6">
+                                            @if (post.IsPublished)
+                                            {
+                                                @:<small class="text-muted navbar-link">Already Published</small>
+                                            }
+                                            else
+                                            {
+                                                @:<a class="btn navbar-btn" href="@Url.Action("Publish","Post",new {id=post.Id})"><small>Publish Now</small></a>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        @if (!post.IsPublished)
+                                        {
+                                            <div class="col-sm-3">
+                                                <a href="@Url.Action("Edit", "Post", new {id = post.Id})"><small class="btn-link" style="color: blue; text-decoration: underline;">Edit</small></a>
+                                            </div>
+                                        }
+                                        <div class="col-sm-3">
+                                            <a href="@Url.Action("Delete", "Post", new { id = post.Id})"><small class="btn-link" style="color: blue; text-decoration: underline;">Delete</small></a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer style="margin-top: 100px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-4">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <p class="text-muted">Copyright &copy; Team Megamind 2015</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="~/Scripts/jquery-2.1.3.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+﻿@model BlogMVCProject.Models.Post
+
+@{
+    Layout = null;
+    var fullName = "";
+    var idUser = 0;
+    if (ViewBag.User != null)
+    {
+        fullName = ViewBag.User.FullName;
+        idUser = ViewBag.User.Id;
+    }
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta property="og:url" content="http://www.google.com" />
+    <meta property="og:title" content="@Model.Title" />
+    <meta property="og:description" content="@Model.Content.Take(100).Aggregate("",(c,d)=>c+d)..." />
+    <meta name="viewport" content="width=device-width" />
+    <meta property="og:image" content="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-prn1/851565_496755187057665_544240989_n.jpg" />
+    <title>@Model.Title</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.css" rel="stylesheet" />
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <style>
+        p {
+            text-align: justify;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '986011164762085',
+                xfbml: true,
+                version: 'v2.2'
+            });
+        };
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=986011164762085&version=v2.0";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="@Url.Action("Index","Home")">YourBlog</a>
+                <ul class="nav navbar-nav">
+                    <li><a href="@Url.Action("Index","Home")">Home <span class="sr-only">(current)</span></a></li>
+                    <li><a href="@Url.Action("Users","Home")">Authors <span class="sr-only">(current)</span></a></li>
+                    <li><a href="@Url.Action("Register","Home")">Register <span class="sr-only">(current)</span></a></li>
+                </ul>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                @if (ViewBag.User != null)
+                {
+                    <div class="navbar-form navbar-right">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">@ViewBag.User.FullName<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="@Url.Action("Create", "Post")">New Post</a></li>
+                                    <li><a href="@Url.Action("PostOfUser", "Post", new {id = ViewBag.User.Id})">My Posts</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#">My Info</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="@Url.Action("SignOut", "Home")">Sign Out</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <form class="navbar-form navbar-right" role="search">
+                        <div class="form-group">
+                            <button type="button" class="btn navbar-btn" data-toggle="modal" data-target="#signInModal">
+                                Sign in
+                            </button>
+                        </div>
+                    </form>
+                }
+
+                <form class="navbar-form navbar-right" role="search" method="POST" action="@Url.Action("Search","Post")">
+                    <div class="form-group">
+                        <input type="text" id="search" name="search" class="form-control" placeholder="Search">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" id="submit" class="btn btn-info">Search</button>
+                    </div>
+                </form>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="https://www.twitter.com">
+                            <i class="fa fa-twitter fa-2x"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.facebook.com">
+                            <i class="fa fa-facebook fa-2x"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.github.com">
+                            <i class="fa fa-github fa-2x"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+    <div class="form-horizontal">
+        <div class="page-header">
+            <div class="form-group">
+                <h1><span class="control-label col-sm-offset-2 col-sm-6" style="text-align: left;">Title: @Model.Title</span></h1>
+            </div>
+            <div class="form-group">
+                <small class="text-muted"><label class="control-label col-sm-offset-2 col-sm-10" style="text-align: left;">Posted On @Model.PostedDate.ToLongDateString() @Model.PostedDate.ToShortTimeString()</label></small>
+                <small class="text-muted"><label class="control-label col-sm-offset-2 col-sm-10" style="text-align: left;">Viewed @Model.NoOfView times</label></small>
+                <small class="text-muted"><label class="control-label col-sm-offset-2 col-sm-10" style="text-align: left;">Author: @Model.User.FullName</label></small>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-4">
+                <div class="form-group">
+                    <h3>Content: </h3>
+                    <p>@Html.Raw(@Model.Content)</p>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-3">
+                        <div class="fb-share-button" data-href="http://www.prothom-alo.com" data-layout="button_count"></div>
+                    </div>
+                    <div class="col-sm-3">
+                        <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://localhost:5116/Post/Details/@Model.Id" data-text="Enter Data text here" data-size="large" data-count="none">Tweet</a>
+                    </div>
+                    <div class="col-sm-3">
+                        <script src="//platform.linkedin.com/in.js" type="text/javascript"></script>
+                        <script type="IN/Share" data-onsuccess="lnksuccess" data-onerror="error" data-url="http://localhost:5116/Post/Details/@Model.Id">
+                        </script>
+                    </div>
+                </div>
+                
+                
+                <script>!function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (!d.getElementById(id)) { js = d.createElement(s); js.id = id; js.src = "//platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs); } }(document, "script", "twitter-wjs");</script>
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <h4>Comments</h4>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @if (ViewBag.User != null)
+                    {
+                        <div class="col-sm-6">
+                            <table class="table" id="commentTable">
+                                @foreach (var comment in @Model.Comments)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="form-group">
+                                                <h4 class="control-label col-sm-12" style="text-align: left;">@comment.User.FullName</h4>
+                                                <small class="text-muted col-sm-12">@comment.CommentDate.ToLongDateString()</small>
+                                                <small class="text-muted col-sm-12">@comment.CommentDate.ToLongTimeString()</small>
+                                            </div>
+                                            <div class="form-group">
+                                                <small class="control-label col-sm-12" style="text-align: left">@comment.Content</small>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                            <textarea id="commentToAdd" class="form-control col-sm-12" placeholder="write a comment"></textarea>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="bg-danger" style="color: red;"><label class="control-label">You have to Sign in to view comments or write a comment</label></p>
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#signInModal">
+                            Sign in
+                        </button>
+                    }
+
+                </div>
+            </div>
+            <div class="col-sm-offset-2 col-sm-4">
+                <h4>Other posts of this Author: </h4>
+                @foreach (var post in ViewBag.LikePost)
+                {
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <a href="@Url.Action("Details","Post",new{id=post.Id})">@post.Title</a>
+                            <p><small class="text-muted">Viewed @post.NoOfView times</small></p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="signInModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Sign in</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" id="signInForm">
+                        <div class="form-group">
+                            <label for="name" class="col-sm-3 control-label">User Name</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="User Name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pass" class="col-sm-3 control-label">Password</label>
+                            <div class="col-sm-6">
+                                <input type="password" class="form-control" id="pass" name="pass" maxlength="8" placeholder="Password">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-3 col-sm-3">
+                                <button type="submit" id="signIn" class="btn btn-success">Sign in</button>
+                            </div>
+                            <div class="col-sm-6" style="margin-left: -30px;">
+                                <span id="spinner" hidden="">
+                                    <i class="fa fa-spinner fa-spin fa-2x"></i>
+                                </span>
+                                <span id="error" style="color: red; margin-left: -35px;"></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <label class="control-label col-sm-offset-4 col-sm-6">Not Registered? Sign Up Now.</label>
+                        <div class="col-sm-2">
+                            <a class="btn btn-primary" href="@Url.Action("Register","Home")">
+                                Sign Up
+                            </a>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <ul class="list-inline text-center">
+                            <li><span class="text-muted">YourBlog</span></li>
+                            <li>
+                                <p class="text-muted">Copyright &copy; Team Megamind 2015</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="margin-top: 100px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-4">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <p class="text-muted">Copyright &copy; Team Megamind 2015</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="~/Scripts/jquery-2.1.3.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#signInForm").submit(function () {
+                $("#signIn").html("Signing in...");
+                $("#spinner").show();
+                var name = $("#name").val();
+                var password = $("#pass").val();
+                var jsonData = { userName: name, password: password };
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("CheckUser","Home")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(jsonData),
+                    dataType: "json",
+                    success: function (data) {
+                        if (data == true) {
+                            $('#myModal').modal('hide');
+                            $("#name").val("");
+                            $("#pass").val("");
+                            window.location = "@Url.Action("Details","Post",new {id=Model.Id,val="temp"})";
+                        } else {
+                            $("#spinner").hide();
+                            $("#signIn").html("Sign in");
+                            $("#error").show();
+                            $("#error").html("User name or password is wrong.");
+                        }
+                    },
+                });
+                return false;
+            });
+            $('#signInModal').click(function () {
+                $("#error").hide();
+            });
+
+            $("#commentToAdd").on("keypress", function (e) {
+                if (e.keyCode == 13) {
+                    var text = $("#commentToAdd").val();
+                    $("#commentTable").append('<tr><td><div class="form-group"><h4 class="control-label col-sm-12" style="text-align: left;">@fullName</h4><small class="text-muted col-sm-12">@DateTime.Now.ToLongDateString()</small><small class="text-muted col-sm-12">@DateTime.Now.ToLongTimeString()</small></div><div class="form-group"><small class="control-label col-sm-12" style="text-align: left">' + text + '</small></div></td></tr>');
+                    $("#commentToAdd").val("");
+                    var jsonData = { Content: text, PostId: "@Model.Id", UserId: "@idUser" };
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("AddComment","Post")',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(jsonData),
+                        dataType: "json",
+                        success: function (data) {
+                            if (data == true) {
+                            }
+                        },
+                    });
+                    return false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

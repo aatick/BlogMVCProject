@@ -1,0 +1,145 @@
+﻿@model BlogMVCProject.Models.Post
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.css" rel="stylesheet" />
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <style>
+        p {
+            text-align: justify;
+        }
+    </style>
+</head>
+    <body>
+        <nav class="navbar navbar-default navbar-fixed-top">
+                  <div class="container-fluid">
+                      <!-- Brand and toggle get grouped for better mobile display -->
+                      <div class="navbar-header">
+                          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                              <span class="sr-only">Toggle navigation</span>
+                              <span class="icon-bar"></span>
+                              <span class="icon-bar"></span>
+                              <span class="icon-bar"></span>
+                          </button>
+                          <a class="navbar-brand" href="@Url.Action("Index","Home")">YourBlog</a>
+                          <ul class="nav navbar-nav">
+                              <li><a href="@Url.Action("Index","Home")">Home <span class="sr-only">(current)</span></a></li>
+                              <li><a href="@Url.Action("Users","Home")">Authors <span class="sr-only">(current)</span></a></li>
+                              <li><a href="@Url.Action("Register","Home")">Register <span class="sr-only">(current)</span></a></li>
+                          </ul>
+                      </div>
+                      <!-- Collect the nav links, forms, and other content for toggling -->
+                      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                          <div class="navbar-form navbar-right">
+                              <ul class="nav navbar-nav">
+                                  <li class="dropdown">
+                                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">@ViewBag.User.FullName<span class="caret"></span></a>
+                                      <ul class="dropdown-menu" role="menu">
+                                          <li><a href="@Url.Action("Create", "Post")">New Post</a></li>
+                                          <li><a href="@Url.Action("PostOfUser", "Post", new {id = ViewBag.User.Id})">My Posts</a></li>
+                                          <li class="divider"></li>
+                                          <li><a href="#">My Info</a></li>
+                                          <li class="divider"></li>
+                                          <li><a href="@Url.Action("SignOut", "Home")">Sign Out</a></li>
+                                      </ul>
+                                  </li>
+                              </ul>
+                          </div>
+
+                          <form class="navbar-form navbar-right" role="search" method="POST" action="@Url.Action("Search","Post")">
+                              <div class="form-group">
+                                  <input type="text" id="search" name="search" class="form-control" placeholder="Search">
+                              </div>
+                              <div class="form-group">
+                                  <button type="submit" id="submit" class="btn btn-info">Search</button>
+                              </div>
+                          </form>
+
+                          <ul class="nav navbar-nav navbar-right">
+                              <li>
+                                  <a href="https://www.twitter.com">
+                                      <i class="fa fa-twitter fa-2x"></i>
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="https://www.facebook.com">
+                                      <i class="fa fa-facebook fa-2x"></i>
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="https://www.github.com">
+                                      <i class="fa fa-github fa-2x"></i>
+                                  </a>
+                              </li>
+                          </ul>
+                      </div><!-- /.navbar-collapse -->
+                  </div><!-- /.container-fluid -->
+              </nav>
+    
+        <form class="form-horizontal" style="margin-top: 50px;" method="POST" action="@Url.Action("Edit","Post")">
+            <div class="form-horizontal">
+                <div class="page-header">
+                    <div class="form-group">
+                        <div class="form-group">
+                            <h2><label class="control-label col-sm-offset-2 col-sm-10" style="text-align: left;">Hello @Model.User.UserName, Write your Post Here: </label></h2>
+                            <span class="text-muted control-label col-sm-offset-2 col-sm-12" style="text-align: left;">Author: @Model.User.FullName</span>
+                            <span class="text-muted control-label col-sm-offset-2 col-sm-12" style="text-align: left;">Email: @Model.User.Email</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-2">
+                        <h4><label class="control-label">Title:</label></h4>
+                    </div>
+                    <div class="col-sm-6" style="margin-left: -150px;">
+                        <textarea class="form-control" name="Title">@Model.Title</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-2">
+                        <h4><label class="control-label">Content:</label></h4>
+                    </div>
+                    <div class="col-sm-6" style="margin-left: -150px;">
+                        <textarea class="ckeditor" name="Content">@Html.Raw(Model.Content)</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-6 col-sm-4">
+                        <input type="hidden" name="postId" value="@Model.Id" />
+                        <input type="submit" class="btn btn-success" style="margin-left: 100px;" name="SaveAndPublish" value="Save & Publish" />
+                        <input type="submit" class="btn btn-success" name="save" value="Save" />
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <footer style="margin-top: 100px;" class="navbar navbar-default">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <ul class="list-inline text-center">
+                            <li>
+                                <p class="text-muted">Copyright &copy; Team Megamind 2015</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <script src="~/Scripts/jquery-2.1.3.min.js"></script>
+        <script src="~/Scripts/jquery.validate.min.js"></script>
+        <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+        <script src="~/Scripts/bootstrap.js"></script>
+        <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+    </body>
+</html>
